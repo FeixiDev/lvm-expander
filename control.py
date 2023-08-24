@@ -21,28 +21,28 @@ class LVMExtend(object):
     def extend_vg(self, vg):
         try:
             vg_name = vg['name']
-            device = vg['device']
+            devices = vg['device']
         except KeyError:
             print("Invalid VG configuration")
             return
-
-        result = lvm_cmds.check_device(device)
-        if "No such file or directory" in result:
-            print(f"Cannot open {device}: No such file or directory")
-            sys.exit()
-        else:
-            print(f"Creating PV: {device}")
-            result = lvm_cmds.create_pv(device)
-            if "successfully" in result:
-                print(f"The {device} is successfully created ")
+        for device in devices:
+            result = lvm_cmds.check_device(device)
+            if "No such file or directory" in result:
+                print(f"Cannot open {device}: No such file or directory")
+                sys.exit()
             else:
-                print(result)
-            print(f"Expanding VG: {vg_name}")
-            result = lvm_cmds.extend_vg(vg_name, device)
-            if "successfully" in result:
-                print(f"The {vg_name} is successfully rescaled ")
-            else:
-                print(result)
+                print(f"Creating PV: {device}")
+                result = lvm_cmds.create_pv(device)
+                if "successfully" in result:
+                    print(f"The {device} is successfully created ")
+                else:
+                    print(result)
+                print(f"Expanding VG: {vg_name}")
+                result = lvm_cmds.extend_vg(vg_name, device)
+                if "successfully" in result:
+                    print(f"The {vg_name} is successfully rescaled ")
+                else:
+                    print(result)
 
     def extend_thinpool(self, vg):
         try:
