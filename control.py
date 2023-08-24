@@ -33,9 +33,16 @@ class LVMExtend(object):
         else:
             print(f"Creating PV: {device}")
             result = lvm_cmds.create_pv(device)
-            if
+            if "successfully" in result:
+                print(f"The {device} is successfully created ")
+            else:
+                print(result)
             print(f"Expanding VG: {vg_name}")
-            lvm_cmds.extend_vg(vg_name, device)
+            result = lvm_cmds.extend_vg(vg_name, device)
+            if "successfully" in result:
+                print(f"The {vg_name} is successfully rescaled ")
+            else:
+                print(result)
 
     def extend_thinpool(self, vg):
         try:
