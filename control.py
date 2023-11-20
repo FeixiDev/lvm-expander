@@ -1,3 +1,4 @@
+import argparse
 import utils
 import lvm_cmds
 import sys
@@ -11,10 +12,10 @@ class LVMExtend(object):
 
     def extend_lvm(self):
         for vg in self.vg_config:
-            if vg.get('device'):
+            if vg.get('device') is not None:
                 print("String extend VG")
                 self.extend_vg(vg)
-            if vg.get('thin_pool'):
+            if vg.get('thin_pool') is not None:
                 print("String extend Thinpool")
                 self.extend_thinpool(vg)
 
@@ -62,4 +63,11 @@ class LVMExtend(object):
 
 
 if __name__ == '__main__':
-    LVMExtend().extend_lvm()
+    parser = argparse.ArgumentParser(description='None')
+    parser.add_argument('-v', '--version', action='store_true',
+                        help='Show version information')
+    args = parser.parse_args()
+    if args.version:
+        print("version: v1.0.0")
+    else:
+        LVMExtend().extend_lvm()
