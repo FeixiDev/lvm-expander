@@ -84,6 +84,9 @@ class ConfFile(object):
             yaml.dump(self.config, f, default_flow_style=False)
 
     def check_config(self):
+        if self.config["vg"] is None:
+            print("Configuration 'vg' is None in lvm_config.yaml")
+            sys.exit()
         try:
             for vg in self.config["vg"]:
                 if not vg["name"]:
