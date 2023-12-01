@@ -14,11 +14,13 @@ class LVMExtend(object):
             if vg.get('device'):
                 print("String extend VG")
                 self.extend_vg(vg)
-            if vg.get('thin_pool'):
+            thin_pool = vg.get('thin_pool')
+            if thin_pool and thin_pool.get('name') and thin_pool.get('size'):
                 print("String extend Thinpool")
                 self.extend_thinpool(vg)
 
-    def extend_vg(self, vg):
+    @staticmethod
+    def extend_vg(vg):
         try:
             vg_name = vg['name']
             devices = vg['device']
@@ -41,10 +43,9 @@ class LVMExtend(object):
                 result = lvm_cmds.extend_vg(vg_name, device)
                 if "successfully" in result:
                     print(f"The {vg_name} is successfully rescaled ")
-                else:
-                    print(result)
 
-    def extend_thinpool(self, vg):
+    @staticmethod
+    def extend_thinpool(vg):
         try:
             thin_pool = vg['thin_pool']
             pool_name = thin_pool["name"]
@@ -57,9 +58,3 @@ class LVMExtend(object):
         result = lvm_cmds.extend_pool(pool_name, vg['name'], size)
         if "successfully" in result:
             print(f"The {pool_name} is successfully rescaled ")
-        else:
-            print(result)
-
-
-if __name__ == '__main__':
-    LVMExtend().extend_lvm()
