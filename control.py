@@ -1,3 +1,4 @@
+import argparse
 import utils
 import lvm_cmds
 import sys
@@ -11,13 +12,12 @@ class LVMExtend(object):
 
     def extend_lvm(self):
         for vg in self.vg_config:
-            if vg.get('device'):
+            if vg.get('device') is not None:
                 print("String extend VG")
                 self.extend_vg(vg)
+                
             thin_pool = vg.get('thin_pool')
             if thin_pool and thin_pool.get('name') and thin_pool.get('size'):
-                print("String extend Thinpool")
-                self.extend_thinpool(vg)
 
     @staticmethod
     def extend_vg(vg):
@@ -58,3 +58,5 @@ class LVMExtend(object):
         result = lvm_cmds.extend_pool(pool_name, vg['name'], size)
         if "successfully" in result:
             print(f"The {pool_name} is successfully rescaled ")
+        else:
+            print(result)
