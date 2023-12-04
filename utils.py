@@ -42,22 +42,18 @@ def exec_local_cmd(cmd):
         result = sub_conn.stdout
         return {"st": True, "rt": result}
     else:
-        print(f"Can't to execute command: {cmd}")
         err = sub_conn.stderr
-        print(f"Error message:{err}")
+        print(f"Error message:{err.decode()}")
         return {"st": False, "rt": err}
 
 
 def exec_cmd(cmd):
     result = exec_local_cmd(cmd)
     result = result.decode() if isinstance(result, bytes) else result
-    log_data = f'{get_host_ip()} - {cmd} - {result}'
+    log_data = f'{get_host_ip()} - {cmd} - {result["rt"].decode()}'
     Log().logger.info(log_data)
-    if result['st']:
-        pass
-        # f_result = result['rt'].rstrip('\n')
     if result['st'] is False:
-        sys.exit()
+        return {"st": False, "rt": result['rt'].decode()}
     return result['rt'].decode()
 
 
@@ -74,9 +70,30 @@ class ConfFile(object):
                 yaml_dict = yaml.safe_load(f)
             return yaml_dict
         except FileNotFoundError:
-            print("Please check the file name:", self.yaml_file)
+            print(
+                f"File {self.yaml_file} not found,but creating a default yaml,"
+                f"please check the contents of the lvm_config.yaml")
+            self.create_default_yaml()
+            sys.exit()
         except TypeError:
             print("Error in the type of file name.")
+
+    def create_default_yaml(self):
+        """创建默认的YAML文件"""
+        default_config = {
+            "vg": [
+                {
+                    "name": "<vg name>",
+                    "device": ["<device>", "<device>"],
+                    "thin_pool": {
+                        "name": "<thin_pool name>",
+                        "size": "<size>"
+                    }
+                }
+            ]
+        }
+        with open(self.yaml_file, 'w', encoding='utf-8') as f:
+            yaml.dump(default_config, f, default_flow_style=False)
 
     def update_yaml(self):
         """更新文件内容"""
