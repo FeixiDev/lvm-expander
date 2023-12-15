@@ -1,0 +1,7 @@
+vg:
+ - name: <vg name>
+   device:
+     - <device>
+   thin_pool:
+    - name: <thin_pool name>
+      size: <size>
