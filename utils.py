@@ -33,35 +33,20 @@ def check_ip(ip):
         return False
 
 
-def exec_local_cmd(cmd):
-    """
-    命令执行
-    """
-    sub_conn = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    if sub_conn.returncode == 0:
-        result = sub_conn.stdout
-        return {"st": True, "rt": result}
-    else:
-        err = sub_conn.stderr
-        print(f"Error message:{err.decode()}")
-        return {"st": False, "rt": err}
-
-
 def exec_cmd(cmd):
-    result = exec_local_cmd(cmd)
+    result = subprocess.getoutput(cmd)
     result = result.decode() if isinstance(result, bytes) else result
-    log_data = f'{get_host_ip()} - {cmd} - {result["rt"].decode()}'
+    log_data = f'{get_host_ip()} - {cmd} - {result}'
     Log().logger.info(log_data)
-    if result['st'] is False:
-        return {"st": False, "rt": result['rt'].decode()}
-    return result['rt'].decode()
+    if result:
+        result = result.rstrip('\n')
+    return result
 
 
 class ConfFile(object):
     def __init__(self):
         self.yaml_file = "lvm_config.yaml"
         self.config = self.read_yaml()
-        self.check_config()
 
     def read_yaml(self):
         """读YAML文件"""
@@ -84,11 +69,13 @@ class ConfFile(object):
             "vg": [
                 {
                     "name": "<vg name>",
-                    "device": ["<device>", "<device>"],
-                    "thin_pool": {
-                        "name": "<thin_pool name>",
-                        "size": "<size>"
-                    }
+                    "device": ["<device>"],  # 修改为列表
+                    "thin_pool": [
+                        {
+                            "name": "<thin_pool name>",
+                            "size": "<size>"
+                        }
+                    ]
                 }
             ]
         }
@@ -133,8 +120,8 @@ class Log(object):
 
     @staticmethod
     def set_handler(logger):
-        now_time = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        file_name = str(now_time) + '.log'
+        now_time = datetime.datetime.now().strftime('%Y-%m-%d')
+        file_name = "vsdslvmexpander_" + str(now_time) + '.log'
         fh = logging.FileHandler(file_name, mode='a')
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")

@@ -1,8 +1,7 @@
 vg:
-  - name: <vg name>
-    device:                 # 根据该值判断是否创建 PV 以及扩容 VG
-      - <device>
-      - <device>
-    thin_pool:               # 根据该值判断是否需要扩容 thin pool
-      name: <thin_pool name>
+ - name: <vg name>
+   device:
+     - <device>
+   thin_pool:
+    - name: <thin_pool name>
       size: <size>
